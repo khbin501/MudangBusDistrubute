@@ -15,6 +15,3 @@ redis = Redis(
 )
 
 # 연결 테스트용 API
-@app.get("/")
-def read_root():
-    return {"message": "DB 연결 세팅 완료!"}

@@ -22,3 +22,7 @@ def serve_html():
 def serve_js():
     js_path = os.path.join(BASE_DIR, "script.js")
     return FileResponse(js_path)
+
+@app.get("/db")
+def read_root():
+    return {"message": "DB 연결 세팅 완료!"}
