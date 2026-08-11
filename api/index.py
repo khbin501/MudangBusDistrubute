@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 import os
-
+from .DB import read_root
 app = FastAPI()
 
 # 현재 실행 중인 파일(api/index.py)의 부모 폴더(최상위 디렉토리) 경로 계산
@@ -24,5 +24,5 @@ def serve_js():
     return FileResponse(js_path)
 
 @app.get("/db")
-def read_root():
-    return {"message": "DB 연결 세팅 완료!"}
+def db_start():
+    return read_root()
