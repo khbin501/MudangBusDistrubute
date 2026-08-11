@@ -8,8 +8,8 @@ load_dotenv()
 
 # 2. 불러온 URL과 TOKEN을 꺼내서 Redis DB에 연결합니다.
 redis = Redis(
-    url=os.getenv("UPSTASH_REDIS_REST_URL"),
-    token=os.getenv("UPSTASH_REDIS_REST_TOKEN")
+    url=os.getenv("DB_URL"),
+    token=os.getenv("DB_TOKEN")
 )
 # 연결 테스트용 API
 def read_root():
