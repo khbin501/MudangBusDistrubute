@@ -6,6 +6,7 @@ app = FastAPI()
 
 # 현재 실행 중인 파일(api/index.py)의 부모 폴더(최상위 디렉토리) 경로 계산
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 @app.get("/api")
 def read_api():
     return {"message": "안녕하세요! Vercel 서버리스에서 돌아가는 FastAPI입니다."}
@@ -25,3 +26,8 @@ def serve_js():
 @app.get("/db")
 def db_start():
     return read_root()
+
+@app.get("/health")
+def health_check():
+    return {"status" : "ok"}
+
