@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 import os
 from .DB import read_root
+from pydantic import BaseModel
 app = FastAPI()
-
 # 현재 실행 중인 파일(api/index.py)의 부모 폴더(최상위 디렉토리) 경로 계산
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -30,4 +30,14 @@ def db_start():
 @app.get("/health")
 def health_check():
     return {"status" : "ok"}
+
+class DefineList(BaseModel):
+    bus_station : str
+queue_list = []
+
+@app.post("/queue")
+def add_queue(bus_station : DefineList):
+    queue_list.append(bus_station)
+    return {"position": len(queue_list)}
+
 
