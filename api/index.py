@@ -34,10 +34,10 @@ def health_check():
 class DefineList(BaseModel):
     bus_station : str
 queue_list = []
-
+ 
 @app.post("/queue")
 def add_queue(bus_station : DefineList):
     queue_list.append(bus_station)
-    return {"position": len(queue_list)}
+    return {"your position": queue_list}
 
 
