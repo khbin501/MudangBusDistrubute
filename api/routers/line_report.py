@@ -11,4 +11,4 @@ line_report = APIRouter(
 
 @line_report.get("/line-report")
 def report(user_report : LineReportCreate):
-    return set_line_report
+    return set_line_report(user_report)
