@@ -9,6 +9,6 @@ line_report = APIRouter(
     tags=["line_report"]
 )
 
-@line_report.get("/line-report")
+@line_report.post("/line-report")
 def report(user_report : LineReportCreate):
     return set_line_report(user_report)
