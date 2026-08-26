@@ -3,25 +3,34 @@ from fastapi import APIRouter
 from upstash_redis import Redis
 from dotenv import load_dotenv
 
-db_router = APIRouter(
+health_check = APIRouter(
     prefix="/api/v1",
     tags=["health_check"]
 )
-# 1. 비서(dotenv)를 시켜서 .env 파일의 내용을 파이썬으로 불러옵니다.
 load_dotenv()
 
+db_url = os.getenv("DB_URL")
+db_token = os.getenv("DB_TOKEN")
+
+if not db_url or not db_token:
+    raise ValueError("DB_URL 또는 DB_TOKEN 환경변수가 없습니다.")
 
 # 2. 불러온 URL과 TOKEN을 꺼내서 Redis DB에 연결합니다.
 redis = Redis(
-    url=os.getenv("DB_URL"),
-    token=os.getenv("DB_TOKEN")
+    url = db_url,
+    token= db_token
 )
-# 연결 테스트용 API
-@db_router.get("/db-check")
+
+@health_check.get("/api/server-health-check")
+def read_api():
+    return {"message": "fastapi server health check."}
+
+# db 연결 테스트용 API
+@health_check.get("/db-health-check")
 def db_check():
     try:
         # 1. DB에 테스트용 데이터를 저장해 봅니다.
-        redis.set("test_key", "무당이 알리미 DB 연결 대성공!")
+        redis.set("test_key", "DB connection succsess!")
         
         # 2. 방금 저장한 데이터를 다시 불러와 봅니다.
         result = redis.get("test_key")
