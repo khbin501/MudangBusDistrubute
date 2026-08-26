@@ -20,7 +20,7 @@ const state = {
     selectedLevel: null,
     selectedBus: null,
     loading: false,
-    demo: false,
+    demo: true,
     requestSequence: 0,
     statusController: null,
 };
@@ -218,7 +218,7 @@ async function submitLineReport() {
     elements.lineSubmit.disabled = true;
     elements.lineSubmit.textContent = "제보 보내는 중…";
     try {
-        await request("/line-reports", { method: "POST", headers: { "Idempotency-Key": makeIdempotencyKey("line") }, body: JSON.stringify({ station: state.station, level: state.selectedLevel, device_id: getDeviceId() }) });
+        await request("/line-reports", { method: "POST", headers: { "Idempotency-Key": makeIdempotencyKey("line") }, body: JSON.stringify({ station_name: state.station, congestion_level: state.selectedLevel, device_id: getDeviceId() }) });
         setNotice("대기열 제보가 반영됐어요. 고맙습니다!", "success");
         await loadStatus({ quiet: true });
     } catch (error) {

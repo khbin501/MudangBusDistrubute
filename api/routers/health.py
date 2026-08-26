@@ -21,8 +21,8 @@ redis = Redis(
     token= db_token
 )
 
-@health_check.get("/api/server-health-check")
-def read_api():
+@health_check.get("/server-health-check")
+def server_check():
     return {"message": "fastapi server health check."}
 
 # db 연결 테스트용 API
