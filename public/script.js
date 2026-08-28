@@ -211,10 +211,10 @@ function selectBus(bus) {
 
 async function submitLineReport() {
     if (!state.selectedLevel) return;
-    if (state.demo) {
-        setNotice(`대기열 ${state.selectedLevel}단계 제보 화면이 정상 동작합니다. API 구현 후 실제 저장됩니다.`, "success");
-        return;
-    }
+    // if (state.demo) {
+    //     setNotice(`대기열 ${state.selectedLevel}단계 제보 화면이 정상 동작합니다. API 구현 후 실제 저장됩니다.`, "success");
+    //     return;
+    // }
     elements.lineSubmit.disabled = true;
     elements.lineSubmit.textContent = "제보 보내는 중…";
     try {
