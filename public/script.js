@@ -20,7 +20,7 @@ const state = {
     selectedLevel: null,
     selectedBus: null,
     loading: false,
-    demo: true,
+    demo: false,
     requestSequence: 0,
     statusController: null,
 };
