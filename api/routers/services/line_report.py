@@ -1,13 +1,14 @@
 import json
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from typing import cast
 from uuid import uuid4
 
 from ...database import redis
 from ..schemas.schemas import LineReportCreate
 
 
-REPORT_VALID_SECONDS = 15 * 60
+REPORT_VALID_SECONDS = 1 * 10
 IDEMPOTENCY_TTL_SECONDS = 24 * 60 * 60
 
 
@@ -15,13 +16,14 @@ def _reports_key(station_name: str) -> str:
     return f"line_reports:{station_name}"
 
 def set_line_report(report: LineReportCreate, idempotency_key: str | None = None):
-    if idempotency_key:
+    if idempotency_key: # idempotency key 캐싱데이터 불러오고 없으면 캐싱
         cached = redis.get(f"line_report_idempotency:{idempotency_key}")
         if cached:
             return json.loads(cached)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc) + timedelta(hours=9)
     timestamp = now.timestamp()
+
     stored_report = {
         "id": str(uuid4()),
         "station_name": report.station_name,
@@ -54,7 +56,10 @@ def get_station_status(station_name: str):
     timestamp = time.time()
     key = _reports_key(station_name)
     redis.zremrangebyscore(key, "-inf", timestamp - REPORT_VALID_SECONDS)
-    values = redis.zrangebyscore(key, timestamp - REPORT_VALID_SECONDS, "+inf")
+    values = cast(
+        list[str],
+        redis.zrangebyscore(key, timestamp - REPORT_VALID_SECONDS, "+inf"),
+    )
     reports = [json.loads(value) for value in values]
 
     if not reports:

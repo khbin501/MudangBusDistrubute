@@ -54,12 +54,12 @@ function getDeviceId() {
         id = crypto.randomUUID ? crypto.randomUUID() : `device-${Date.now()}-${Math.random().toString(16).slice(2)}`;
         localStorage.setItem(storageKey, id);
     }
-    return id;
+    return id; // random UUID 반환
 }
 
 function makeIdempotencyKey(type) {
     const random = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(16).slice(2);
-    return `${type}-${Date.now()}-${random}`;
+    return `${type}-${Date.now()}-${random}`; //UUID 활용해서 IdempotencyKey 생성
 }
 
 function setNotice(message = "", type = "info") {
