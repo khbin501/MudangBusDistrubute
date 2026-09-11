@@ -1,6 +1,14 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 class LineReportCreate(BaseModel):
-    station_name : str
-    congestion_level : int = Field(le=1, ge=5)
-    device_id : str
+    station_name: Literal["semiconductor", "ai_engineering"]
+    congestion_level: int = Field(ge=1, le=5)
+    device_id: str = Field(min_length=1, max_length=200)
+
+
+class DepartureCreate(BaseModel):
+    station: Literal["semiconductor", "ai_engineering"]
+    bus_type: Literal["small", "large", "white"]
+    device_id: str = Field(min_length=1, max_length=200)

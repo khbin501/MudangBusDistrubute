@@ -1,26 +1,11 @@
-import os
 from fastapi import APIRouter
-from upstash_redis import Redis
-from dotenv import load_dotenv
+
+from ..database import redis
 
 health_check = APIRouter(
     prefix="/api/v1",
     tags=["health_check"]
-)
-load_dotenv()
-
-db_url = os.getenv("DB_URL")
-db_token = os.getenv("DB_TOKEN")
-
-if not db_url or not db_token:
-    raise ValueError("DB_URL 또는 DB_TOKEN 환경변수가 없습니다.")
-
-# 2. 불러온 URL과 TOKEN을 꺼내서 Redis DB에 연결합니다.
-redis = Redis(
-    url = db_url,
-    token= db_token
-)
-
+)   
 @health_check.get("/server-health-check")
 def server_check():
     return {"message": "fastapi server health check."}
