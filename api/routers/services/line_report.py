@@ -10,6 +10,7 @@ from .departure import get_latest_departure, get_latest_queue_reduction
 
 
 REPORT_VALID_SECONDS = 10 * 60
+QUEUE_DECAY_INTERVAL_SECONDS = 2 * 60
 IDEMPOTENCY_TTL_SECONDS = 1 * 60
 REPORT_COOLDOWN_SECONDS = 30
 
@@ -92,7 +93,7 @@ def set_line_report(report: LineReportCreate, idempotency_key: str | None = None
 
 
 def get_station_status(station_name: str):
-    
+    now = datetime.now(timezone(timedelta(hours=9)))
     timestamp = time.time()
     key = _reports_key(station_name)
     redis.zremrangebyscore(key, "-inf", timestamp - REPORT_VALID_SECONDS)
@@ -122,6 +123,10 @@ def get_station_status(station_name: str):
     valid_reports = list(latest_by_device.values())
     average = sum(item["congestion_level"] for item in valid_reports) / len(valid_reports)
     level = max(1, min(5, int(average + 0.5)))
+    latest_reported_at = max(datetime.fromisoformat(item["reported_at"]) for item in valid_reports)
+    no_report_seconds = max(0, (now - latest_reported_at).total_seconds())
+    decay_levels = int(no_report_seconds // QUEUE_DECAY_INTERVAL_SECONDS)
+    level = max(1, level - decay_levels)
     if queue_reduction:
         level = max(1, level - queue_reduction)
     count = len(valid_reports)
@@ -130,7 +135,7 @@ def get_station_status(station_name: str):
         "level": level,
         "confidence": "high" if count >= 5 else "medium" if count >= 2 else "low",
         "report_count": count,
-        "updated_at": max(item["reported_at"] for item in valid_reports),
+        "updated_at": latest_reported_at.isoformat(),
         "message": None,
         "incoming_bus": incoming_bus,
     }
