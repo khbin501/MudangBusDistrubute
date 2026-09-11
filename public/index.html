@@ -68,6 +68,7 @@
         .meta span { display: inline-flex; align-items: center; gap: 5px; }
         .refresh { position: relative; z-index: 1; margin: 18px 0 0; padding: 0; border: 0; color: var(--blue); background: transparent; cursor: pointer; font-size: 12px; font-weight: 900; }
         .refresh[disabled] { cursor: wait; opacity: .55; }
+        .auto-refresh-counter { position: absolute; right: 20px; bottom: 20px; z-index: 1; padding: 8px 10px; border: 1px solid rgba(40, 95, 143, .18); border-radius: 999px; color: var(--blue); background: rgba(255, 254, 250, .94); font-size: 11px; font-weight: 900; }
 
         .bus-alert { display: flex; align-items: center; gap: 14px; padding: 17px 19px; border-color: #ead9a8; background: #fff9e8; }
         .bus-icon { display: grid; flex: none; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: #f8e5a8; font-size: 23px; }
@@ -80,6 +81,12 @@
         .section-subtitle { margin: -10px 2px 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
         .report-card { padding: 21px; }
         .report-card h3 { margin: 0; font-size: 16px; }
+        .report-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .info-button { display: grid; flex: none; place-items: center; width: 22px; height: 22px; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--blue); background: white; cursor: pointer; font-family: Georgia, serif; font-size: 14px; font-weight: 900; font-style: italic; }
+        .info-button[aria-expanded="true"] { border-color: var(--blue); color: white; background: var(--blue); }
+        .info-message { margin: 10px 0 -2px; padding: 11px 12px; border-radius: 12px; color: #255b86; background: var(--blue-soft); font-size: 12px; font-weight: 700; line-height: 1.6; }
+        .info-message p { margin: 0; }
+        .info-message ul { margin: 4px 0 0; padding-left: 17px; }
         .report-card > p { margin: 7px 0 17px; color: var(--muted); font-size: 12px; line-height: 1.5; }
         .level-options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
         .level-option { min-width: 0; min-height: 62px; padding: 8px 2px; border: 1px solid var(--line); border-radius: 14px; color: var(--muted); background: #fff; cursor: pointer; }
@@ -140,6 +147,7 @@
                     <span>👥 <span id="report-count">유효 제보 —건</span></span>
                 </div>
                 <button class="refresh" id="refresh-button" type="button">↻ 지금 새로고침</button>
+                <div class="auto-refresh-counter" id="auto-refresh-counter" role="status" aria-live="polite">자동 새로고침 준비 중</div>
             </section>
 
             <section class="card bus-alert" id="bus-alert" hidden aria-live="polite">
@@ -153,21 +161,35 @@
             <p class="section-subtitle">지금 정류장에 있다면 짧은 제보로 다음 사람을 도와주세요.</p>
 
             <section class="card report-card">
-                <h3>🙋 대기열은 어느 정도인가요?</h3>
+                <div class="report-heading">
+                    <h3>🙋 대기열은 어느 정도인가요?</h3>
+                    <button class="info-button" type="button" aria-expanded="false" aria-controls="queue-info" data-info-target="queue-info" aria-label="대기열 단계 기준 안내">i</button>
+                </div>
+                <div class="info-message" id="queue-info" hidden><p>3단계 기준은 반도체대학 정문입니다.</p></div>
                 <p>실제 줄 인원과 가장 가까운 단계를 선택해주세요.</p>
                 <div class="level-options" id="level-options" aria-label="대기열 단계 선택">
-                    <button type="button" class="level-option" aria-pressed="false" data-level="1"><b>1</b><small>0~5명</small></button>
-                    <button type="button" class="level-option" aria-pressed="false" data-level="2"><b>2</b><small>6~10명</small></button>
-                    <button type="button" class="level-option" aria-pressed="false" data-level="3"><b>3</b><small>11~20명</small></button>
-                    <button type="button" class="level-option" aria-pressed="false" data-level="4"><b>4</b><small>21~30명</small></button>
-                    <button type="button" class="level-option" aria-pressed="false" data-level="5"><b>5</b><small>31명+</small></button>
+                    <button type="button" class="level-option" aria-pressed="false" data-level="1"><b>1</b><small>0~20명</small></button>
+                    <button type="button" class="level-option" aria-pressed="false" data-level="2"><b>2</b><small>20~40명</small></button>
+                    <button type="button" class="level-option" aria-pressed="false" data-level="3"><b>3</b><small>40~60명</small></button>
+                    <button type="button" class="level-option" aria-pressed="false" data-level="4"><b>4</b><small>60~80명</small></button>
+                    <button type="button" class="level-option" aria-pressed="false" data-level="5"><b>5</b><small>100명+</small></button>
                 </div>
                 <p class="selection-help" id="level-help">단계를 선택하면 설명이 표시됩니다.</p>
                 <button class="primary" id="line-submit" type="button" disabled>대기열 제보 보내기</button>
             </section>
 
             <section class="card report-card">
-                <h3>🚌 방금 어떤 버스가 출발했나요?</h3>
+                <div class="report-heading">
+                    <h3>🚌 방금 어떤 버스가 출발했나요?</h3>
+                    <button class="info-button" type="button" aria-expanded="false" aria-controls="bus-info" data-info-target="bus-info" aria-label="버스 종류 안내">i</button>
+                </div>
+                <div class="info-message" id="bus-info" hidden>
+                    <ul>
+                        <li>작은무당이: 5명 좌석 4개</li>
+                        <li>큰무당이: 5명 좌석 5개</li>
+                        <li>흰둥이: 흰색 버스</li>
+                    </ul>
+                </div>
                 <p>현재 선택한 정류장에서 출발한 버스를 선택해주세요.</p>
                 <div class="bus-options" id="bus-options" aria-label="출발 버스 선택">
                     <button type="button" class="bus-option" aria-pressed="false" data-bus="small">작은무당이</button>

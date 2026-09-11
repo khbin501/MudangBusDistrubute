@@ -3,7 +3,7 @@ from typing import Literal
 from fastapi import APIRouter, Header, HTTPException, status
 
 from .schemas.schemas import LineReportCreate
-from .services.line_report import get_station_status, set_line_report
+from .services.line_report import ReportCooldownError, get_station_status, set_line_report
 
 line_report = APIRouter(
     prefix="/api/v1",
@@ -17,6 +17,14 @@ def report(
 ):
     try:
         return set_line_report(user_report, idempotency_key)
+    except ReportCooldownError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail={
+                "message": "잠시 후 다시 제보할 수 있습니다.",
+                "retry_after": exc.retry_after,
+            },
+        ) from exc
     except Exception as exc:
         raise HTTPException(status_code=503, detail="제보를 저장하지 못했습니다.") from exc
 
